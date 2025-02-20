@@ -5,6 +5,7 @@ from Components import SpriteRenderer
 from Player import Player
 from Enemy import Enemy
 from Components import Collider
+from Components import Button
 import pygame
 import random
 
@@ -56,3 +57,15 @@ class EnemyBuilder(Builder):
 
     def get_gameObject(self) -> GameObject:
         return self._gameObject
+    
+class MenuBuilder(Builder):
+    def __init__(self):
+        self.menu_object = GameObject("Menu")
+
+    def add_button(self, text, position, size, color, callback):
+        button = Button(position, size, text, color, callback)
+        self.menu_object.add_component(button)
+        return self
+
+    def build(self):
+        return self.menu_object
