@@ -59,12 +59,15 @@ class EnemyBuilder(Builder):
         return self._gameObject
     
 class MenuBuilder(Builder):
+    
     def __init__(self):
         self.menu_object = GameObject("Menu")
+        self.menu_object._components = {}  # Sørg for, at components er en dictionary
 
     def add_button(self, text, position, size, color, callback):
         button = Button(position, size, text, color, callback)
-        self.menu_object.add_component(button)
+        button_id = f"Button_{len(self.menu_object._components)}"  # Gør knappen unik
+        self.menu_object._components[button_id] = button  # Tilføj til dictionary
         return self
 
     def build(self):

@@ -7,6 +7,7 @@ from Player import Player
 from Builder import PlayerBuilder
 from Builder import EnemyBuilder
 from Builder import MenuBuilder
+from SoundManager import SoundManager
 pygame.init
 class GameWorld:
 
@@ -21,9 +22,13 @@ class GameWorld:
         self._clock = pygame.time.Clock()
         self._game_started = False
 
-        self.menu = MenuBuilder().add_button(
-            "Play", (self._screen.get_width() / 2 - 100, 200), (200, 50), (0, 128, 255), lambda: self.start_game()
-        ).build()
+        self.menu = MenuBuilder() \
+            .add_button("Start", (self._screen.get_width() / 2 -100, 200), (200, 50), (0, 128, 255), lambda: self.start_game()) \
+            .add_button("Options", (self._screen.get_width() / 2 -100, 300), (200, 50), (0, 128, 255), lambda: self.show_options()) \
+            .add_button("Quit", (self._screen.get_width() / 2 -100, 400), (200, 50), (0, 128, 255), lambda: self.quit_game()) \
+            .build()
+        
+        self.sound_manager = SoundManager()
 
     @property
     def screen(self):
@@ -90,6 +95,7 @@ class GameWorld:
 
                 self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
             else:
+                self.sound_manager.play_sound("laser shot")
                 for component in self.menu._components.values():  
                     if hasattr(component, "draw"):
                         component.draw(self._screen)
