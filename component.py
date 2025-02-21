@@ -169,6 +169,17 @@ class Laser(Components):
 class Collider(Components):
     def __init__(self) -> None:
         super().__init__()
+        self._subscriptions = {}
+
+    def subscribe(self, event_type, callback):
+        if event_type not in self._subscriptions:
+            self._subscriptions[event_type] = []
+        self._subscriptions[event_type].append(callback)
+
+    def notify(self, event_type, other):
+        if event_type in self._subscriptions:
+            for callback in self._subscriptions[event_type]:
+                callback(other)
 
     def awake(self, game_world):
         pass

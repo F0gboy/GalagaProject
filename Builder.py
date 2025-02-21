@@ -1,7 +1,6 @@
 from abc import ABC, abstractclassmethod
 from gameObject import GameObject
-from component import Animator
-from component import SpriteRenderer
+from component import Animator, SpriteRenderer, Collider
 from player import Player
 from enemy import Enemy
 import pygame
@@ -22,6 +21,7 @@ class PlayerBuilder(Builder):
         self._gameObject = GameObject(pygame.math.Vector2(0,0))
         self._gameObject.add_component(SpriteRenderer("player.png"))
         self._gameObject.add_component(Player())
+        self._gameObject.add_component(Collider())  # Add Collider component
         animator = self._gameObject.add_component(Animator())
 
         animator.add_animation("Idle","player02.png",
