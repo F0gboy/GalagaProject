@@ -19,8 +19,6 @@ class GameObject:
     def destroy(self):
         self._is_destroyed = True
 
-
-
     def add_component(self, component):
         component_name = component.__class__.__name__
         self._components[component_name] = component
@@ -31,7 +29,9 @@ class GameObject:
         return self._components.get(component_name,None)
     
     def awake(self, game_world):
+        print(f"Awakening GameObject with components: {self._components.keys()}")
         for component in self._components.values():
+            print(f"Awakening component: {component}")
             component.awake(game_world)
 
     def start(self):

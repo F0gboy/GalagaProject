@@ -8,7 +8,9 @@ from Builder import PlayerBuilder
 from Builder import EnemyBuilder
 from Builder import MenuBuilder
 from SoundManager import SoundManager
-pygame.init
+
+pygame.init()  # Add parentheses to initialize pygame
+
 class GameWorld:
 
     def __init__(self) -> None:
@@ -45,17 +47,20 @@ class GameWorld:
         # Tilføj spilleren
         player_builder = PlayerBuilder()
         player_builder.build()
-        self._gameObjects.append(player_builder.get_gameObject())
+        self.instantiate(player_builder.get_gameObject())
+        #self.instantiate(player)
 
         # Tilføj fjender
         enemy_builder = EnemyBuilder()
         enemy_builder.build()
-        self._gameObjects.append(enemy_builder.get_gameObject())
+        self.instantiate(enemy_builder.get_gameObject())
+        #self.instantiate(enemy)
 
     def quit_game(self):
         self._running = False
     
     def instantiate(self, gameObject):
+        print(f"Instantiating GameObject: {gameObject}")
         gameObject.awake(self)
         gameObject.start()
         self._gameObjects.append(gameObject)
@@ -63,6 +68,7 @@ class GameWorld:
 
     def Awake(self):
         for gameObject in self._gameObjects[:]:
+            print(f"Awakening GameObject: {gameObject}")
             gameObject.awake(self)
     
     def Start(self):
@@ -114,5 +120,4 @@ gw = GameWorld()
 gw.Awake()
 gw.Start()
 gw.update()
-
         

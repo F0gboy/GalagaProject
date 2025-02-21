@@ -57,11 +57,11 @@ class SpriteRenderer(Component):
 
     def __init__(self, sprite_name) -> None:
         super().__init__()
-
         self._sprite_image = pygame.image.load(f"Assets\\{sprite_name}")
         self._sprite = pygame.sprite.Sprite()
         self._sprite.rect = self._sprite_image.get_rect()
         self._sprite_mask = pygame.mask.from_surface(self.sprite_image)
+        self._game_world = None  # Add this line to define the attribute
 
     @property
     def sprite_image(self):
@@ -73,23 +73,27 @@ class SpriteRenderer(Component):
     
     @sprite_image.setter
     def sprite_image(self, value):
-        self._sprite_image= value
+        self._sprite_image = value
 
     @property
     def sprite(self):
         return self._sprite
    
     def awake(self, game_world):
-      self._game_world = game_world
-      self._sprite.rect.topleft = self.gameObject.transform.position
+        print(f"Awakening SpriteRenderer with game_world: {game_world}")
+        self._game_world = game_world  # Set the game world here
+        self._sprite.rect.topleft = self.gameObject.transform.position
 
     def start(self):
         pass
    
     def update(self, delta_time):
+        if self._game_world is None:
+            print("Error: _game_world is None in SpriteRenderer.update")
         self._sprite.rect.topleft = self.gameObject.transform.position
-        self._game_world.screen.blit(self._sprite_image,self._sprite.rect) 
-    
+        self._game_world.screen.blit(self._sprite_image, self._sprite.rect) 
+
+# ...existing code...
 class Animator(Component):
 
     def __init__(self) -> None:
