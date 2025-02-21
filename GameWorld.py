@@ -51,6 +51,9 @@ class GameWorld:
         enemy_builder = EnemyBuilder()
         enemy_builder.build()
         self._gameObjects.append(enemy_builder.get_gameObject())
+
+    def quit_game(self):
+        self._running = False
     
     def instantiate(self, gameObject):
         gameObject.awake(self)
@@ -95,7 +98,7 @@ class GameWorld:
 
                 self._gameObjects = [obj for obj in self._gameObjects if not obj.is_destroyed]
             else:
-                self.sound_manager.play_sound("laser shot")
+                self.sound_manager.play_sound("space menu")
                 for component in self.menu._components.values():  
                     if hasattr(component, "draw"):
                         component.draw(self._screen)
