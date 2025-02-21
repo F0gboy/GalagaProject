@@ -1,10 +1,10 @@
-from Components import Component
+from component import Components
 import pygame
-from GameObject import GameObject
-from Components import Laser
-from Components import SpriteRenderer
+from gameObject import GameObject
+from component import Laser
+from component import SpriteRenderer
 
-class Player(Component):
+class Player(Components):
 
     def awake(self, game_world):  
         self._time_since_last_shot = 1
@@ -15,11 +15,6 @@ class Player(Component):
         self._sprite_size = pygame.math.Vector2(sr.sprite_image.get_width(),sr.sprite_image.get_height())
         self._gameObject.transform.position.x = (self._screen_size.x/2) - (self._sprite_size.x/2)
         self._gameObject.transform.position.y = (self._screen_size.y) - (self._sprite_size.y)
-        collider = self._gameObject.get_component("Collider")
-        collider.subscribe("collision_enter",self.on_collision_enter)
-        collider.subscribe("collision_exit", self.on_collision_exit)
-        collider.subscribe("pixel_collision_enter", self.on_pixel_collision_enter)
-        collider.subscribe("pixel_collision_exit", self.on_pixel_collision_exit)
 
     def start(self):
         pass
@@ -56,30 +51,15 @@ class Player(Component):
     
     def shoot(self):
         if self._time_since_last_shot >= self._shoot_dealy:
-            projectile = GameObject(None)
+            projectile = GameObject(pygame.math.Vector2(0, 0))
             sr = projectile.add_component(SpriteRenderer("laser.png"))
             projectile.add_component(Laser())
 
-            projectile_position = pygame.math.Vector2(self._gameObject.transform.position.x+(self._sprite_size.x/2)-sr.sprite_image.get_width()/2
-                                                    ,self._gameObject.transform.position.y-40)
+            projectile_position = pygame.math.Vector2(self._gameObject.transform.position.x+(self._sprite_size.x/2)-sr.sprite_image.get_width()/2,
+                                                      self._gameObject.transform.position.y-40)
             
             projectile.transform.position = projectile_position
             
             self._game_world.instantiate(projectile)
             
             self._time_since_last_shot = 0
-    
-    def on_collision_enter(self, other):
-        print("collision enter")
-
-    def on_collision_exit(self, other):
-        print("collision exit")
-
-    def on_pixel_collision_enter(self, other):
-        print("pixel collision enter")
-
-    def on_pixel_collision_exit(self, other):
-        print("pixel collision exit")
-        
-
-
