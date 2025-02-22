@@ -19,8 +19,9 @@ class PlayerBuilder(Builder):
 
     def build(self):
         self._gameObject = GameObject(pygame.math.Vector2(0,0))
+        self._gameObject.tag = "Player"  # Set tag for player
         sprite_renderer = self._gameObject.add_component(SpriteRenderer("player.png"))
-        sprite_renderer.resize(150, 150)  # Resize the player sprite to be smaller
+        sprite_renderer.resize(20, 20)  # Resize the player sprite to be smaller
         self._gameObject.add_component(Player())
         self._gameObject.add_component(Collider())  # Add Collider component
         animator = self._gameObject.add_component(Animator())
@@ -51,11 +52,13 @@ class EnemyBuilder(Builder):
         self.enemy_type = enemy_type
         self.position = position
         self._gameObject = GameObject(position)
+        self._gameObject.tag = "Enemy"  # Set tag for enemy
         sprites = ["enemy_01.png", "enemy_02.png", "enemy_03.png"]
         selected_sprite = enemy_type
         sprite_renderer = self._gameObject.add_component(SpriteRenderer(selected_sprite))
         sprite_renderer.resize(size[0], size[1])
         self._gameObject.add_component(Enemy(speed, attack_frequency))
+        self._gameObject.add_component(Collider())  # Add Collider component
         self._gameObjects.append(self._gameObject)
 
     def build_wave(self, enemy_type, position, number_of_enemies, size=(50, 50), screen_width=1280, speed=300, attack_frequency=0.5):

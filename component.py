@@ -65,6 +65,7 @@ class SpriteRenderer(Components):
         self._sprite = pygame.sprite.Sprite()
         self._sprite.rect = self._sprite_image.get_rect()
         self._sprite_mask = pygame.mask.from_surface(self.sprite_image)
+        self._game_world = None  # Initialize _game_world attribute
 
     def resize(self, width, height):
         self._sprite_image = pygame.transform.scale(self._sprite_image, (width, height))
@@ -88,16 +89,18 @@ class SpriteRenderer(Components):
         return self._sprite
    
     def awake(self, game_world):
-      self._game_world = game_world
-      self._sprite.rect.topleft = self.gameObject.transform.position
+        self._game_world = game_world  # Set _game_world attribute
+        self._sprite.rect.topleft = self.gameObject.transform.position
 
     def start(self):
         pass
    
     def update(self, delta_time):
         self._sprite.rect.topleft = self.gameObject.transform.position
-        self._game_world.screen.blit(self._sprite_image,self._sprite.rect)
-    
+        self._game_world.screen.blit(self._sprite_image, self._sprite.rect)
+
+    def set_alpha(self, alpha):
+        self._sprite_image.set_alpha(alpha)
 
 class Animator(Components):
 
@@ -162,10 +165,10 @@ class Laser(Components):
             self.gameObject.destroy()
 
     def on_collision_enter(self, other):
-        if other.gameObject.get_component("Enemy") is not None:
+        if other.gameObject.tag == "Enemy":
             self.gameObject.destroy()
             other.gameObject.destroy()
-
+            
 class Collider(Components):
     def __init__(self) -> None:
         super().__init__()
@@ -182,10 +185,20 @@ class Collider(Components):
                 callback(other)
 
     def awake(self, game_world):
-        pass
+        self._game_world = game_world
+        self._game_world.colliders.append(self)
 
     def start(self):
         pass
 
     def update(self, delta_time):
-        pass
+        for other in self._game_world.colliders:
+            if other != self:
+                if self.check_collision(other):
+                    self.notify("collision_enter", other)
+                    other.notify("collision_enter", self)
+
+    def check_collision(self, other):
+        self_rect = self.gameObject.get_component("SpriteRenderer").sprite.rect
+        other_rect = other.gameObject.get_component("SpriteRenderer").sprite.rect
+        return self_rect.colliderect(other_rect)

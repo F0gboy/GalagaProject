@@ -16,6 +16,7 @@ class GameWorld:
 
         self._gameObjects = []
         self._colliders = []
+        self._timers = []  # List to keep track of timers
         builder = PlayerBuilder()
         builder.build()
 
@@ -59,10 +60,29 @@ class GameWorld:
         game_object.awake(self)
         game_object.start()
 
+    def destroy(self, game_object):
+        if game_object in self._gameObjects:
+            self._gameObjects.remove(game_object)
+            if game_object in self._colliders:
+                self._colliders.remove(game_object)
+
     def trigger_attack(self):
         if self._front_row_enemies:
             enemy = random.choice(self._front_row_enemies)
             enemy.get_component("Enemy").start_attack()
+
+    def start_timer(self, delay, callback):
+        event_id = pygame.USEREVENT + len(self._timers)
+        pygame.time.set_timer(event_id, int(delay * 1000))
+        self._timers.append((event_id, callback))
+
+    def handle_timers(self):
+        for event in pygame.event.get():
+            if event.type >= pygame.USEREVENT:
+                for timer in self._timers:
+                    if event.type == timer[0]:
+                        timer[1]()
+                        pygame.time.set_timer(event.type, 0)  # Stop the timer
 
     @property
     def screen(self):
@@ -86,3 +106,5 @@ class GameWorld:
 
         for game_object in self._gameObjects:
             game_object.update(delta_time)
+
+        self.handle_timers()  # Handle timer events

@@ -1,4 +1,3 @@
-import pygame
 from component import Transform
 
 class GameObject:
@@ -8,6 +7,7 @@ class GameObject:
         self._transform = self.add_component(Transform(position))
         self._is_destroyed = False
         self._game_world = None
+        self._tag = None  # Add tag attribute
 
     @property
     def transform(self):
@@ -35,9 +35,16 @@ class GameObject:
             component.awake(game_world)
 
     def start(self):
-        for component in self._components.values():
-            component.start()
+        pass
 
     def update(self, delta_time):
         for component in self._components.values():
             component.update(delta_time)
+
+    @property
+    def tag(self):
+        return self._tag
+
+    @tag.setter
+    def tag(self, value):
+        self._tag = value
