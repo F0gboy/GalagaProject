@@ -80,8 +80,7 @@ class SpriteRenderer(Component):
         return self._sprite
    
     def awake(self, game_world):
-        print(f"Awakening SpriteRenderer with game_world: {game_world}")
-        self._game_world = game_world  # Set the game world here
+        self._game_world = game_world
         self._sprite.rect.topleft = self.gameObject.transform.position
 
     def start(self):
@@ -93,7 +92,6 @@ class SpriteRenderer(Component):
         self._sprite.rect.topleft = self.gameObject.transform.position
         self._game_world.screen.blit(self._sprite_image, self._sprite.rect) 
 
-# ...existing code...
 class Animator(Component):
 
     def __init__(self) -> None:
@@ -125,18 +123,15 @@ class Animator(Component):
 
         self._animation_time += delta_time
 
-        #skal vi skifte frame
         if self._animation_time >= frame_duration:
             self._animation_time = 0
             self._current_frame_index += 1
             
-            #får vi fat på vores aimation
             animation_sequence = self._animations[self._current_animation]
 
             if self._current_frame_index >= len(animation_sequence):
-                self._current_frame_index = 0 #Resetter vores animation
+                self._current_frame_index = 0
             
-            #Skifter til en ny sprite
             self._sprite_renderer.sprite_image = animation_sequence[self._current_frame_index]
 
 class Laser(Component):
@@ -230,15 +225,11 @@ class Collider():
                 self.collision_exit(other)
                 other.collision_exit(self)
 
-
     def check_pixel_collision(self, collision_box1, collision_box2, mask1, mask2):
         offset_x = collision_box2.x - collision_box1.x
         offset_y = collision_box2.y - collision_box1.y
 
         return mask1.overlap(mask2, (offset_x,offset_y)) is not None
-
-
-
 
     def start(self):
         pass
