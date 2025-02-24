@@ -63,10 +63,19 @@ class GameWorld:
     def destroy(self, game_object):
         if game_object in self._gameObjects:
             self._gameObjects.remove(game_object)
-            if game_object in self._colliders:
-                self._colliders.remove(game_object)
+            collider = game_object.get_component("Collider")
+            if collider in self._colliders:
+                self._colliders.remove(collider)
 
     def trigger_attack(self):
+        self._front_row_enemies = self._enemy_builder.get_front_row_enemies()
+        if len(self._front_row_enemies) < 7:
+            self._front_row_enemies.extend(self._enemy_builder2.get_front_row_enemies())
+        if len(self._front_row_enemies) < 5:
+            self._front_row_enemies.extend(self._enemy_builder3.get_front_row_enemies())
+
+        self._front_row_enemies = [enemy for enemy in self._front_row_enemies if not enemy.is_destroyed]
+
         if self._front_row_enemies:
             enemy = random.choice(self._front_row_enemies)
             enemy.get_component("Enemy").start_attack()
@@ -83,6 +92,10 @@ class GameWorld:
                     if event.type == timer[0]:
                         timer[1]()
                         pygame.time.set_timer(event.type, 0)  # Stop the timer
+
+    def is_wave_nearly_dead(self, wave):
+        alive_enemies = [enemy for enemy in wave if not enemy.is_destroyed]
+        return len(alive_enemies) <= 7  # Adjust the threshold as needed
 
     @property
     def screen(self):

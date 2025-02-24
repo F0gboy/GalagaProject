@@ -57,3 +57,8 @@ class Enemy(Components):
     def start_attack(self):
         self._attacking = True
         self._attack_target = pygame.math.Vector2(self._gameObject._game_world._gameObjects[0].transform.position.x, self._gameObject._game_world._gameObjects[0].transform.position.y)
+
+    def on_collision_enter(self, other):
+        if other.gameObject.tag == "Laser":
+            self._game_world.destroy(self.gameObject)
+            self._game_world.destroy(other.gameObject)

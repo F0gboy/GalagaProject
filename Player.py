@@ -2,7 +2,7 @@ from abc import ABC
 from component import Components
 import pygame
 from gameObject import GameObject
-from component import Laser
+from component import Laser, Collider
 from component import SpriteRenderer
 
 class Player(Components, ABC):
@@ -69,8 +69,10 @@ class Player(Components, ABC):
                 return
 
             projectile = GameObject(None)
+            projectile.tag = "Laser"  # Set tag for laser
             sr = projectile.add_component(SpriteRenderer("laser.png"))
             projectile.add_component(Laser())
+            projectile.add_component(Collider())  # Add Collider component to the laser
 
             projectile_position = pygame.math.Vector2(
                 self._gameObject.transform.position.x + (self._sprite_size.x / 2) - sr.sprite_image.get_width() / 2,
@@ -123,9 +125,3 @@ class Player(Components, ABC):
 
     def game_over(self):
         print("❌ GAME OVER!")
-        self._game_world.destroy(self._gameObject)
-        self._game_world.start_timer(2, self.show_game_over_screen)
-
-    @staticmethod
-    def show_game_over_screen():
-        print("🕹️ Show Game Over Screen Here")

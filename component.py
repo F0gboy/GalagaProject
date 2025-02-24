@@ -150,8 +150,10 @@ class Animator(Components):
 class Laser(Components):
 
     def awake(self, game_world):
-        pass
-
+        self._game_world = game_world
+        collider = self._gameObject.get_component("Collider")
+        collider.subscribe("collision_enter", self.on_collision_enter)
+        
     def start(self):
         pass
 
@@ -162,13 +164,13 @@ class Laser(Components):
         self.gameObject.transform.translate(movement * delta_time)
 
         if self.gameObject.transform.position.y < 0:
-            self.gameObject.destroy()
+            self._game_world.destroy(self.gameObject)  # Use destroy method
 
     def on_collision_enter(self, other):
         if other.gameObject.tag == "Enemy":
-            self.gameObject.destroy()
-            other.gameObject.destroy()
-            
+            self._game_world.destroy(self.gameObject)  # Use destroy method
+            self._game_world.destroy(other.gameObject)  # Use destroy method
+
 class Collider(Components):
     def __init__(self) -> None:
         super().__init__()

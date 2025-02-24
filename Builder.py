@@ -78,5 +78,5 @@ class EnemyBuilder(Builder):
     def get_front_row_enemies(self) -> list:
         if not self._gameObjects:
             return []
-        front_row_y = max(enemy.transform.position.y for enemy in self._gameObjects)
-        return [enemy for enemy in self._gameObjects if enemy.transform.position.y == front_row_y]
+        front_row_y = max(enemy.transform.position.y for enemy in self._gameObjects if not enemy.is_destroyed)
+        return [enemy for enemy in self._gameObjects if enemy.transform.position.y == front_row_y and not enemy.is_destroyed]
