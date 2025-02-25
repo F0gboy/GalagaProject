@@ -41,3 +41,4 @@ class GameObject:
     def update(self, delta_time):
         for component in self._components.values():
             component.update(delta_time)
+

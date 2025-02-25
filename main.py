@@ -16,7 +16,7 @@ def main():
 
         game_world.update(delta_time)
 
-        game_world._screen.fill((0, 0, 0))  # Clear the screen with black
+        #game_world._screen.fill((0, 0, 0))  # Clear the screen with black
         for game_object in game_world._gameObjects:
             sprite_renderer = game_object.get_component("SpriteRenderer")
             if sprite_renderer:
