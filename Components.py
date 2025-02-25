@@ -161,7 +161,7 @@ class Button(Component):
         self.callback = callback
         self.font = pygame.font.Font(None, 36)
         self.rect = pygame.Rect(position, size)
-        self.text_surface = self.font.render(text, True, (255, 255, 255))
+        self.text_surface = self.font.render(text, True, (0, 0, 0))
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)

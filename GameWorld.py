@@ -24,15 +24,15 @@ class GameWorld:
         self._current_music = None
 
         self.menu = MenuBuilder() \
-            .add_button("Start", (self._screen.get_width() / 2 -100, 200), (200, 50), (0, 128, 255), lambda: self.start_game()) \
-            .add_button("Options", (self._screen.get_width() / 2 -100, 300), (200, 50), (0, 128, 255), lambda: self.show_options()) \
-            .add_button("Quit", (self._screen.get_width() / 2 -100, 400), (200, 50), (0, 128, 255), lambda: self.quit_game()) \
+            .add_button("Start", (self._screen.get_width() / 2 -100, 200), (200, 50), (255, 255, 255), lambda: self.start_game()) \
+            .add_button("Options", (self._screen.get_width() / 2 -100, 300), (200, 50), (255, 255, 255), lambda: self.show_options()) \
+            .add_button("Quit", (self._screen.get_width() / 2 -100, 400), (200, 50), (255, 255, 255), lambda: self.quit_game()) \
             .build()
 
         self.options_menu = MenuBuilder() \
-            .add_button("Volume +", (self._screen.get_width() / 2 -100, 250), (200, 50), (0, 128, 255), lambda: self.sound_manager.increase_volume()) \
-            .add_button("Volume -", (self._screen.get_width() / 2 -100, 350), (200, 50), (0, 128, 255), lambda: self.sound_manager.decrease_volume()) \
-            .add_button("Back", (self._screen.get_width() / 2 -100, 450), (200, 50), (0, 128, 255), lambda: self.back_to_menu()) \
+            .add_button("Volume +", (self._screen.get_width() / 2 -100, 250), (200, 50), (255, 255, 255), lambda: self.sound_manager.increase_volume()) \
+            .add_button("Volume -", (self._screen.get_width() / 2 -100, 350), (200, 50), (255, 255, 255), lambda: self.sound_manager.decrease_volume()) \
+            .add_button("Back", (self._screen.get_width() / 2 -100, 450), (200, 50), (255, 255, 255), lambda: self.back_to_menu()) \
             .build()
         
     @property
@@ -96,7 +96,7 @@ class GameWorld:
                     if isinstance(component, Button):
                         component.handle_event(event)
 
-            self._screen.fill("cornflowerblue")
+            self._screen.fill("black")
 
             delta_time = self._clock.tick(60) / 1000.0
 
