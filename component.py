@@ -97,7 +97,7 @@ class SpriteRenderer(Components):
    
     def update(self, delta_time):
         self._sprite.rect.topleft = self.gameObject.transform.position
-        self._game_world.screen.blit(self._sprite_image, self._sprite.rect)
+        self._game_world._screen.blit(self._sprite_image, self._sprite.rect)
 
     def set_alpha(self, alpha):
         self._sprite_image.set_alpha(alpha)
@@ -171,6 +171,35 @@ class Laser(Components):
             self._game_world.destroy(self.gameObject)  # Use destroy method
             self._game_world.destroy(other.gameObject)  # Use destroy method
 
+class Button(Components):
+    def __init__(self, position, size, text, color, callback):
+        super().__init__()
+        self.position = position
+        self.size = size
+        self.text = text
+        self.color = color
+        self.callback = callback
+        self.font = pygame.font.Font(None, 36)
+        self.rect = pygame.Rect(position, size)
+        self.text_surface = self.font.render(text, True, (0, 0, 0))
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect)
+        screen.blit(self.text_surface, (self.rect.x + 10, self.rect.y + 10))
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
+            self.callback()
+
+    def awake(self, game_world):
+        pass
+
+    def start(self):
+        pass
+
+    def update(self, delta_time):
+        pass
+
 class Collider(Components):
     def __init__(self) -> None:
         super().__init__()
@@ -194,8 +223,10 @@ class Collider(Components):
         pass
 
     def update(self, delta_time):
+        if self.gameObject.is_destroyed:
+            return
         for other in self._game_world.colliders:
-            if other != self:
+            if other != self and not other.gameObject.is_destroyed:
                 if self.check_collision(other):
                     self.notify("collision_enter", other)
                     other.notify("collision_enter", self)

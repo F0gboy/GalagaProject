@@ -12,7 +12,7 @@ class Player(Components, ABC):
         self.lives = 3
         self.invincible = False
         self._time_since_last_shot = 1
-        self._shoot_delay = 0.3
+        self._shoot_delay = 0.1
         self._game_world = None
         self._screen_size = None
         self._sprite_size = None
@@ -22,9 +22,9 @@ class Player(Components, ABC):
         self._game_world = game_world
         sr = self._gameObject.get_component("SpriteRenderer")
         self._screen_size = pygame.math.Vector2(game_world.screen.get_width(), game_world.screen.get_height())
-        self._sprite_size = pygame.math.Vector2(sr.sprite_image.get_width(), sr.sprite_image.get_height() /2)
+        self._sprite_size = pygame.math.Vector2(20, 20)
         self._gameObject.transform.position.x = (self._screen_size.x / 2) - (self._sprite_size.x / 2)
-        self._gameObject.transform.position.y = self._screen_size.y - self._sprite_size.y - 20
+        self._gameObject.transform.position.y = 600
         
 
         collider = self._gameObject.get_component("Collider")

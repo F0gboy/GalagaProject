@@ -3,6 +3,7 @@ from gameObject import GameObject
 from component import Animator, SpriteRenderer, Collider
 from player import Player
 from enemy import Enemy
+from component import Button
 import pygame
 import random
 
@@ -76,7 +77,20 @@ class EnemyBuilder(Builder):
         return self._gameObjects
 
     def get_front_row_enemies(self) -> list:
-        if not self._gameObjects:
-            return []
-        front_row_y = max(enemy.transform.position.y for enemy in self._gameObjects if not enemy.is_destroyed)
-        return [enemy for enemy in self._gameObjects if enemy.transform.position.y == front_row_y and not enemy.is_destroyed]
+        #front_row_y = max(enemy.transform.position.y for enemy in self._gameObjects if not enemy.is_destroyed)
+        return [enemy for enemy in self._gameObjects if not enemy.is_destroyed]
+    
+class MenuBuilder(Builder):
+    
+    def __init__(self):
+        self.menu_object = GameObject("Menu")
+        self.menu_object._components = {}
+
+    def add_button(self, text, position, size, color, callback):
+        button = Button(position, size, text, color, callback)
+        button_id = f"Button_{len(self.menu_object._components)}"
+        self.menu_object._components[button_id] = button
+        return self
+
+    def build(self):
+        return self.menu_object
