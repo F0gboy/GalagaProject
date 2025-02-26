@@ -6,6 +6,7 @@ from enemy import Enemy
 from component import Button
 import pygame
 import random
+from bossEnemy import BossEnemy
 
 class Builder(ABC):
 
@@ -23,22 +24,18 @@ class PlayerBuilder(Builder):
         self._gameObject.tag = "Player"  # Set tag for player
         sprite_renderer = self._gameObject.add_component(SpriteRenderer("player.png"))
         sprite_renderer.resize(20, 20)  # Resize the player sprite to be smaller
+        
+        collider = self._gameObject.add_component(Collider())  # Add Collider component
+        collider.set_size(20, 20)  # Resize the collider to match sprite size
+
         self._gameObject.add_component(Player())
-        self._gameObject.add_component(Collider())  # Add Collider component
         animator = self._gameObject.add_component(Animator())
 
-        animator.add_animation("Idle","player02.png",
-                               "player03.png",
-                               "player04.png",
-                               "player05.png",
-                               "player06.png",
-                               "player07.png",
-                               "player08.png",
-                               "player07.png",
-                               "player06.png",
-                               "player05.png",
-                               "player04.png",
-                               "player03.png",)
+        animator.add_animation("Idle",
+                            "player02.png", "player03.png", "player04.png", 
+                            "player05.png", "player06.png", "player07.png", 
+                            "player08.png", "player07.png", "player06.png", 
+                            "player05.png", "player04.png", "player03.png",)
         
         animator.play_animation("Idle")
     
@@ -94,3 +91,16 @@ class MenuBuilder(Builder):
 
     def build(self):
         return self.menu_object
+    
+class BossEnemyBuilder(Builder):
+    def build(self):
+         
+        self._gameObject = GameObject(pygame.math.Vector2(0,0))
+        sprites = ["enemy_01.png"]
+        selected_sprite = random.choice(sprites)
+        self._gameObject.add_component(SpriteRenderer(selected_sprite))
+        self._gameObject.add_component(Collider())
+        self._gameObject.add_component(BossEnemy())
+    
+    def get_gameObject(self) -> GameObject:
+        return self._gameObject

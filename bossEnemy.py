@@ -1,0 +1,99 @@
+from component import Components
+from gameObject import GameObject
+from component import Boss_Laser
+from component import SpriteRenderer
+from component import Collider
+import random
+import pygame
+
+class BossEnemy(Components):
+
+    def awake(self, game_world):
+        sr = self.gameObject.get_component("SpriteRenderer")
+        self._screen_size = pygame.math.Vector2(game_world.screen.get_width(), game_world.screen.get_height())
+        self._sprite_size = pygame.math.Vector2(sr.sprite_image.get_width(), sr.sprite_image.get_height())
+        self._game_world = game_world
+
+        self.shoot_sound = pygame.mixer.Sound("assets/shoot.mp3")  
+        self.reload_sound = pygame.mixer.Sound("assets/reload_2.mp3")
+        # Sæt startposition
+        self.random_x = random.randint(0, int(self._screen_size.x))
+        self.random_y = random.randint(50, min(200, int(self._screen_size.y)))
+        self.gameObject.transform.position = pygame.math.Vector2(self.random_x, self.random_y)
+
+        # Tid mellem skud
+        self.time_since_last_shot = 0
+        self.reload_time = 1.0  # Reload-tid i sekunder
+        self.is_reloading = False 
+
+        self.shoot_timer = 0  # Tæller hvor lang tid bossen har skudt
+        self.reload_interval =2  # Hver 30. sekund skal bossen reloade
+        # Målpunkter for bevægelse
+        self.target_x = self.random_x
+        self.target_y = self.random_y
+
+        self._lives = 10
+        
+        collider = self.gameObject.get_component("Collider")
+        collider.subscribe("collision_enter", self.on_collision_enter)
+        
+        self.gameObject.tag = "BossEnemy"
+    def start(self):
+         pass
+    def update(self, delta_time):
+        speed = 350
+        self.time_since_last_shot += delta_time
+        self.shoot_timer += delta_time  # Opdater total skud-tid
+        # Beregn retningen mod målet
+        direction = pygame.math.Vector2(self.target_x, self.target_y) - self.gameObject.transform.position
+
+        # Hvis objektet er tæt på målet, vælg et nyt mål
+        if direction.length() < 10:
+            self.target_x = random.randint(0, int(self._screen_size.x))
+            self.target_y = random.randint(50, min(200, int(self._screen_size.y)))
+
+        # Normaliser retningen og bevæg mod målet
+        if direction.length() > 0:
+            direction = direction.normalize() * speed * delta_time
+            self.gameObject.transform.translate(direction)
+
+         # Reload-mekanisme
+        if self.is_reloading:
+            self.reload_timer -= delta_time
+            self.reload_sound.play() 
+            if self.reload_timer <= 0:
+                self.is_reloading = False  # Stop reload
+                self.shoot_timer = 0  # Nulstil skud-tid
+            #else:
+                #if self.reload_timer == self.reload_time: # checker om det er første update i reload.
+        else:
+            if self.shoot_timer >= self.reload_interval:
+                self.is_reloading = True  # Start reload
+                self.reload_timer = self.reload_time  # Sæt reload varighed
+            elif self.time_since_last_shot >= 0.8:
+                self.shoot(delta_time)
+                self.time_since_last_shot = 0
+
+    def shoot(self,delta_time):
+       
+            projectile = GameObject(None)
+            sr = projectile.add_component(SpriteRenderer("laser.png"))
+            projectile.add_component(Boss_Laser())
+            projectile.add_component(Collider())  # Ensure collision detection
+            projectile.tag = "EnemyLaser"  # Set tag to EnemyLaser
+            projectile_position = pygame.math.Vector2(
+                self._gameObject.transform.position.x + (self._sprite_size.x/2) - sr.sprite_image.get_width()/2,
+                self._gameObject.transform.position.y + 120
+            )
+            projectile.transform.position = projectile_position
+            self._game_world.instantiate(projectile)
+            self.shoot_sound.play()
+
+    
+    def on_collision_enter(self, other):
+        if other.gameObject.tag == "Laser":
+            self._lives -= 1
+            self._game_world.destroy(other.gameObject)
+            if self._lives <= 0:
+                self._game_world.destroy(self.gameObject)
+  

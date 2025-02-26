@@ -23,13 +23,23 @@ class Player(Components, ABC):
         sr = self._gameObject.get_component("SpriteRenderer")
         self._screen_size = pygame.math.Vector2(game_world.screen.get_width(), game_world.screen.get_height())
         self._sprite_size = pygame.math.Vector2(20, 20)
+        # Position the player based on the desired size
         self._gameObject.transform.position.x = (self._screen_size.x / 2) - (self._sprite_size.x / 2)
         self._gameObject.transform.position.y = 600
         
-
+        # Update the sprite's rect from the transform
+        sr._sprite.rect.topleft = self._gameObject.transform.position
+        
+        # Manually adjust the collider bounds if needed:
         collider = self._gameObject.get_component("Collider")
+        # For example, if the visible area is shifted 5 pixels to the right:
+        custom_rect = sr._sprite.rect.copy()
+        custom_rect.x += 5   # adjust this offset as needed
+        custom_rect.width = 100  # ensure it matches the visible width
+        custom_rect.height = 50  # and height
+        collider._custom_rect = custom_rect  # store it in a custom attribute
+        
         collider.subscribe("collision_enter", self.on_collision_enter)
-
         self.shoot_sound = pygame.mixer.Sound("laser.mp3")
 
     def start(self):

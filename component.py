@@ -200,24 +200,55 @@ class Button(Components):
     def update(self, delta_time):
         pass
 
+class Boss_Laser(Components):
+
+    def awake(self, game_world):
+        self._game_world = game_world
+        collider = self._gameObject.get_component("Collider")
+        collider.subscribe("collision_enter", self.on_collision_enter)
+
+    def start(self):
+        pass
+
+    def update(self, delta_time):
+        speed = 500
+        movement = pygame.math.Vector2(0,speed)
+        
+        self._gameObject.transform.translate(movement*delta_time)
+
+        if self._gameObject.transform.position.y < 0:
+            self._gameObject.destroy()
+
+    def on_collision_enter(self, other):
+        if other.gameObject.tag == "Enemy":
+            self._game_world.destroy(self.gameObject)
+            self._game_world.destroy(other.gameObject)
+        elif other.gameObject.tag == "Player":
+            # Optionally, you can destroy the laser upon hitting the player
+            self._game_world.destroy(self.gameObject)
+
+
 class Collider(Components):
     def __init__(self) -> None:
         super().__init__()
-        self._subscriptions = {}
+        self._subscriptions = {}   # This remains!
+        self._custom_rect = None   # Optional custom rect
 
     def subscribe(self, event_type, callback):
         if event_type not in self._subscriptions:
             self._subscriptions[event_type] = []
         self._subscriptions[event_type].append(callback)
 
-    def notify(self, event_type, other):
-        if event_type in self._subscriptions:
-            for callback in self._subscriptions[event_type]:
-                callback(other)
+    def set_size(self, width, height):
+        pos = self.gameObject.transform.position
+        self._custom_rect = pygame.Rect(pos.x, pos.y, width, height)
 
     def awake(self, game_world):
         self._game_world = game_world
         self._game_world.colliders.append(self)
+        sr = self.gameObject.get_component("SpriteRenderer")
+        if sr:
+            self._custom_rect = sr._sprite.rect.copy()
 
     def start(self):
         pass
@@ -225,13 +256,20 @@ class Collider(Components):
     def update(self, delta_time):
         if self.gameObject.is_destroyed:
             return
+        if self._custom_rect is not None:
+            self._custom_rect.topleft = self.gameObject.transform.position
         for other in self._game_world.colliders:
             if other != self and not other.gameObject.is_destroyed:
                 if self.check_collision(other):
                     self.notify("collision_enter", other)
                     other.notify("collision_enter", self)
 
+    def notify(self, event_type, other):
+        if event_type in self._subscriptions:
+            for callback in self._subscriptions[event_type]:
+                callback(other)
+
     def check_collision(self, other):
-        self_rect = self.gameObject.get_component("SpriteRenderer").sprite.rect
-        other_rect = other.gameObject.get_component("SpriteRenderer").sprite.rect
+        self_rect = self._custom_rect or self.gameObject.get_component("SpriteRenderer").sprite.rect
+        other_rect = other._custom_rect or other.gameObject.get_component("SpriteRenderer").sprite.rect
         return self_rect.colliderect(other_rect)

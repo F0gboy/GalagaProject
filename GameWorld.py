@@ -6,6 +6,8 @@ from player import Player
 from builder import PlayerBuilder, EnemyBuilder, MenuBuilder
 from soundManager import SoundManager
 from enemy import Enemy
+from bossEnemy import BossEnemy
+from builder import BossEnemyBuilder
 
 class GameWorld:
 
@@ -31,6 +33,8 @@ class GameWorld:
         self._options_started = False
         self._current_music = None
         self._level = 1
+        self.score = 0  # Score system
+        self.font = pygame.font.Font(None, 48)  # Larger font for better visibility
         
         self.menu = MenuBuilder() \
             .add_button("Start", (self._screen.get_width() / 2 - 100, 200), (200, 50), (255, 255, 255), lambda: self.start_game()) \
@@ -71,7 +75,6 @@ class GameWorld:
             for enemy in self._enemy_builder3.get_gameObject_list():
                 self.instantiate(enemy)
 
-
         if self._level == 2:
             self._enemy_builder = EnemyBuilder()
             self._enemy_builder.build_wave("enemy_02.png", pygame.math.Vector2(65, 200), 96, size=(15, 15), screen_width=self.screen.get_size()[0])
@@ -82,7 +85,6 @@ class GameWorld:
             self._enemy_builder3.build_wave("enemy_03.png", pygame.math.Vector2(75, 90), 6, size=(85, 85), screen_width=self.screen.get_size()[0])
             for enemy in self._enemy_builder3.get_gameObject_list():
                 self.instantiate(enemy)
-
 
         if self._level == 3:
             self._enemy_builder = EnemyBuilder()
@@ -100,7 +102,16 @@ class GameWorld:
             for enemy in self._enemy_builder3.get_gameObject_list():
                 self.instantiate(enemy)
 
+        if self._level == 4:
+            # Boss enemy wave
+            builder=BossEnemyBuilder()
+            builder.build()
+            self._gameObjects.append(builder.get_gameObject())
+            
+            self.instantiate(builder.get_gameObject())
+
         self._startGame = True
+
 
     def start(self):
         for game_object in self._gameObjects:
@@ -118,6 +129,8 @@ class GameWorld:
             if collider and collider in self._colliders:
                 self._colliders.remove(collider)
             game_object.destroy()  # Ensure the game object is marked as destroyed
+            self.increase_score()
+
 
     def reset_scene(self):
         self._gameObjects.clear()
@@ -147,6 +160,14 @@ class GameWorld:
 
     def quit_game(self):
         self._running = False
+
+    def increase_score(self):
+        self.score += 50
+        print(f"Score: {self.score}")
+
+    def draw_score(self):
+        score_surface = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+        self._screen.blit(score_surface, (20, 20))  # Draw score at top-left corner with padding
 
     def show_options(self):
         self._options_started = True
@@ -180,11 +201,13 @@ class GameWorld:
                 self._time_since_last_attack = 0
 
             # Check if all enemies are destroyed to progress to the next level
-            if not any(isinstance(obj.get_component("Enemy"), Enemy) and not obj.is_destroyed for obj in self._gameObjects):
+            if not any(((obj.get_component("Enemy") is not None) or (obj.get_component("BossEnemy") is not None)) and not obj.is_destroyed for obj in self._gameObjects):
                 self._level += 1
                 self.start_game()
 
         for game_object in self._gameObjects:
             game_object.update(delta_time)
+
+        self.draw_score()
 
         self.handle_timers()  # Handle timer events
