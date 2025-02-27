@@ -114,7 +114,8 @@ class GameWorld:
             if collider and collider in self._colliders:
                 self._colliders.remove(collider)
             game_object.destroy()
-            self.increase_score()
+            if game_object.tag == "Enemy" or game_object.tag == "BossEnemy":
+                self.increase_score()
             if game_object.tag == "BossEnemy":
                 self.game_won()
 

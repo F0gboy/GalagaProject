@@ -49,6 +49,18 @@ def main():
             game_world._screen.fill((0,0,0))
         delta_time = game_world._clock.tick(60) / 1000.0
 
+        if not game_world._startGame and not game_world._options_started and not game_world.win and not game_world.lose:
+            # Draw the title at the top center
+            title_surface = game_world.font.render("Gologo", True, (255, 255, 255))
+            title_x = (game_world._screen.get_width() - title_surface.get_width()) // 2
+            title_y = 100  # You can adjust this Y offset as needed
+            game_world._screen.blit(title_surface, (title_x, title_y))
+            
+            # Now draw the menu buttons
+            for component in game_world.menu._components.values():
+                if hasattr(component, "draw"):
+                    component.draw(game_world._screen)
+
         if game_world._startGame and game_world._current_music != "space ingame":
             game_world.sound_manager.stop_sound()
             game_world.sound_manager.play_sound("space ingame")
